@@ -1,5 +1,5 @@
 import streamlit as st
-from langgraph_backend import chatbot
+from langgraph_backend import chatbot, retrieve_all_threads
 from langchain_core.messages import HumanMessage, AIMessage
 import uuid
 
@@ -33,7 +33,7 @@ if 'thread_id' not in st.session_state:
     st.session_state['thread_id'] = generate_thread_id()
 
 if 'chat_threads' not in st.session_state:
-    st.session_state['chat_threads'] = []
+    st.session_state['chat_threads'] = retrieve_all_threads()
 
 add_thread(st.session_state['thread_id'])
 
@@ -48,7 +48,12 @@ if st.sidebar.button('New Chat'):
 st.sidebar.header('My Conversations')
 
 for thread_id in st.session_state['chat_threads'][::-1]:
-    if st.sidebar.button(str(thread_id)):
+    
+    messages = load_conversation(thread_id)
+    first_msg = next((m.content for m in messages if isinstance(m, HumanMessage)), "New Chat")
+    title = first_msg[:30] + "..." if len(first_msg) > 30 else first_msg
+    
+    if st.sidebar.button(title, key=str(thread_id)):
         st.session_state['thread_id'] = thread_id
         messages = load_conversation(thread_id)
 
@@ -98,3 +103,4 @@ if user_input:
         ai_message = st.write_stream(ai_only_stream())
 
     st.session_state['message_history'].append({'role': 'assistant', 'content': ai_message})
+    st.rerun()
