@@ -6,3 +6,4 @@ heymaxbot.db-wal
 heymaxbot.db-x-checkpoints-1-checkpoint.bin
 __pycache__/langgraph_backend.cpython-313.pyc
 ".env" 
+__pycache__/langgraph_backend.cpython-313.pyc
